@@ -11,7 +11,11 @@ async function scrapeTicketsMarche(page, events) {
       (event) => ({
         title: event.querySelector(".event-name")?.innerText.trim(),
         date: event.querySelector(".event-date")?.innerText.trim(),
-        location: event.querySelector(".event-venue")?.innerText.trim(),
+        location: {
+          name: event.querySelector(".event-venue")?.innerText.trim(), 
+          link: "N/A"
+        }
+        
       })
     );
   });
@@ -75,7 +79,10 @@ async function scrapeTazkarti(page, events) {
           document.querySelector(".startDateWithMinPRice")?.innerText.trim() ||
           "",
         minPrice: document.querySelector(".minPrice")?.innerText.trim() || "",
-        location: [locationName, locationLink],
+        location: {
+          name: locationName, 
+          link: locationLink
+        },
        
       };
     });
@@ -88,13 +95,6 @@ async function scrapeTazkarti(page, events) {
     await new Promise((res) => setTimeout(res, 2000));
     console.log("WAITING FOR PAGE REFRESH");
   }
-
-  tazkartiEvents.forEach((event, index) => {
-    console.log(
-      `TAZKARTI EVENT ${index + 1}: ${JSON.stringify(event, null, 2)}`
-    );
-  });
-
   events.push(tazkartiEvents);
 }
 
@@ -103,11 +103,11 @@ async function scrapeEvents() {
   const page = await browser.newPage();
 
   let events = [];
-  // try {
-  //   await scrapeTicketsMarche(page, events);
-  // } catch (error) {
-  //   console.error("Error scraping TicketsMarche:", error);
-  // }
+  try {
+    await scrapeTicketsMarche(page, events);
+  } catch (error) {
+    console.error("Error scraping TicketsMarche:", error);
+  }
 
   try {
     await scrapeTazkarti(page, events);
@@ -115,9 +115,19 @@ async function scrapeEvents() {
     console.error("Error scraping Tazkarti:", error);
   }
   await browser.close();
+
+
+  
   return events;
 }
 
-scrapeEvents(); //run this ever x amt of time automatically and replace the list that's in the DB, maybe archive the old list
+scrapeEvents().then(events => {
+  events.forEach((eventList, i) => {
+    console.log(`\n--- Event Source ${i + 1} ---`);
+    eventList.forEach(event => {
+      console.log(event);
+    });
+  });
+}); //run this ever x amt of time automatically and replace the list that's in the DB, maybe archive the old list
 
 export { scrapeEvents };

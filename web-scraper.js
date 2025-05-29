@@ -46,7 +46,7 @@ async function scrapeTazkarti(page, events) {
       console.warn(`Card ${i} is undefined`);
       continue;
     } else {
-      console.log();
+      console.log(`Card ${i} found`);
     }
     const link = await cards[i].$("a.eventCategory");
     // Click on the i-th card
@@ -63,18 +63,11 @@ async function scrapeTazkarti(page, events) {
       const anchors = Array.from(
         document.querySelectorAll('a[target="_blank"]')
       );
-
-      // Find the first anchor with a Google Maps link
       const mapsAnchor = anchors.find((a) =>
         a.href.includes("google.com/maps")
       );
-
       const locationLink = mapsAnchor?.href || "";
-      
-      const locationName =
-        mapsAnchor
-          ?.querySelector("span[class*='venuLinkgooglemap']")
-          ?.innerText.trim() || "";
+      const locationName = document.querySelector('.venuLinkgooglemap')?.innerText.trim() || "NOT FOUND";
 
       return {
         title: document.querySelector(".name")?.innerText.trim() || "",
@@ -83,6 +76,7 @@ async function scrapeTazkarti(page, events) {
           "",
         minPrice: document.querySelector(".minPrice")?.innerText.trim() || "",
         location: [locationName, locationLink],
+       
       };
     });
 

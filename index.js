@@ -1,5 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
+import { eventsAggregationByCountry } from "./event-aggregation.js";
+import { scrapeEvents } from "./scraper.js";
 
 // App setup
 const app = express();
@@ -8,19 +10,27 @@ dotenv.config({
 });
 const PORT = process.env.PORT;
 
-
 app.get("/", async (req, res) => {
   res.send("HI FROM EXTERNAL APIS");
 });
 
 app.get("/all-events", async (req, res) => {
-  
-  eventsAggregationByCountry('IE').then((events) => console.log(events));
-
+  eventsAggregationByCountry("IE").then((events) => console.log(events));
 });
 
-app.get("/events/:location", async (req, res) => {
-  var loc = req.params.location;
+app.get("/events/:country", async (req, res) => {
+  const events = [];
+  var countryCode = toString(req.params.country);
+  await eventsAggregationByCountry(countryCode).then((countryEvents) => {
+    console.log(countryEvents);
+    events.push(...countryEvents);
+  });
+  if (countryCode == "EG") {
+    var scrapedEvents = await scrapeEvents(); // check if it needs destructuring
+    events.push(scrapedEvents);
+  }
+
+  res.send(events);
 });
 
 app.get("/event/:id", async (req, res) => {

@@ -7,9 +7,8 @@ dotenv.config({
 let ticketmasterApiKey = process.env.TICKETMASTER_API_KEY;
 
 async function eventsAggregationByCountry(countryCode) {
-
   try {
-   /*  // Fetching from multiple sources
+    /*  // Fetching from multiple sources
     const [res1, res2, res3] = await Promise.all([
       axios.get(`https://app.ticketmaster.com/discovery/v2/events.json?size=2&apikey=${ticketmasterApiKey}&countryCode=${countryCode}`),
       axios.get("https://api.source2.com/events"),
@@ -18,13 +17,17 @@ async function eventsAggregationByCountry(countryCode) {
 
     //combining the sources + deconstructing them in a single array
     const allEvents = [...res1.data, ...res2.data, ...res3.data]; */
-    const [res1] = await Promise.all([
-      axios.get(`https://app.ticketmaster.com/discovery/v2/events.json?size=2&apikey=${ticketmasterApiKey}&countryCode=${countryCode}`)
-    ]);
     
+    //size limited to 10 and fetch again if needed
+    const [res1] = await Promise.all([
+      axios.get(
+        `https://app.ticketmaster.com/discovery/v2/events.json?size=10&countryCode=${countryCode}&apikey=${ticketmasterApiKey}`
+      ),
+    ]);
+
     // Extract events safely
     const allEvents = res1.data?._embedded?.events || [];
-    
+
     //map to store the final events
     const eventMap = new Map();
 
@@ -43,14 +46,10 @@ async function eventsAggregationByCountry(countryCode) {
     const uniqueEvents = Array.from(eventMap.values());
 
     return uniqueEvents;
-  } 
-  catch (error) {
-        console.error("Error fetching events:", error);
-        return [];
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    return [];
   }
 }
 
-// Example usage
-eventsAggregationByCountry('IE').then((events) => console.log(events));
-
-//export {};
+export { eventsAggregationByCountry };

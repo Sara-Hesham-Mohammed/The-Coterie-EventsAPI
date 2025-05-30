@@ -34,6 +34,7 @@ async function eventsAggregationByCountry(countryCode) {
 
     //mapping each one and giving it a unique key, if there's an event with same name and such
     // يبقى ده already exists and won't be added to our list of events
+    // TODO: fix this, make the data sources conform to a data schema and then use that schema to check for dupes
     try {
       allEvents.forEach((eventList) => {
         if (Array.isArray(eventList)) {

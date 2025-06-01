@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { eventsAggregationByCountry } from "./event-aggregation.js";
-import { scrapeEvents } from "./scraper.js";
+import { scrapeEvents } from "./web-scraper.js";
 
 // App setup
 const app = express();
@@ -14,23 +14,24 @@ app.get("/", async (req, res) => {
   res.send("HI FROM EXTERNAL APIS");
 });
 
-app.get("/all-events", async (req, res) => {
-  eventsAggregationByCountry("IE").then((events) => console.log(events));
-});
+app.get("/all-events/:country", async (req, res) => {
+  console.log(`Fetching events for country: ${req.params.country}`);
 
-app.get("/events/:country", async (req, res) => {
   const events = [];
-  var countryCode = toString(req.params.country);
-  await eventsAggregationByCountry(countryCode).then((countryEvents) => {
-    console.log(countryEvents);
-    events.push(...countryEvents);
-  });
-  if (countryCode == "EG") {
-    var scrapedEvents = await scrapeEvents(); // check if it needs destructuring
-    events.push(scrapedEvents);
-  }
+  const countryCode = req.params.country;
 
-  res.send(events);
+  // Get aggregated events
+  const countryEvents = await eventsAggregationByCountry(countryCode);
+  events.push(...countryEvents);
+
+  // // If Egypt, also scrape
+  // if (countryCode.toUpperCase() === "EG") {
+  //   const scrapedEvents = await scrapeEvents();
+  //   events.push(...scrapedEvents);
+  // }
+
+  // Send the response ONCE
+  res.status(200).json(events);
 });
 
 app.get("/event/:id", async (req, res) => {

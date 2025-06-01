@@ -1,5 +1,8 @@
 import axios from "axios";
 import dotenv from "dotenv";
+import EventDTO from "./DTO/EventDTO.js";
+import LocationDTO from "./DTO/LocationDTO.js";
+
 dotenv.config({
   path: "./config/.env",
 });
@@ -27,7 +30,10 @@ async function eventsAggregationByCountry(countryCode) {
     ]);
 
     //combining the sources + deconstructing them in a single array
-    const allEvents = [res1.data?._embedded?.events|| ['Source One Error'], res2.data?.results || ['Source Two Error']];
+    const allEvents = [
+      res1.data?._embedded?.events || ["Source One Error"],
+      res2.data?.results || ["Source Two Error"],
+    ];
 
     //map to store the final events
     const eventMap = new Map();
@@ -39,11 +45,81 @@ async function eventsAggregationByCountry(countryCode) {
       allEvents.forEach((eventList) => {
         if (Array.isArray(eventList)) {
           eventList.forEach((event) => {
+            // Helper function to safely get address
+            const getAddress = (event) => {
+              // Check for PredictHQ format (geo.geometry)
+              if (event.geo && event.geo.geometry && event.geo.geometry.address) {
+                return event.geo.geometry.address;
+              }
+              
+              // Check for Ticketmaster format (_embedded.venues)
+              if (event._embedded && event._embedded.venues && event._embedded.venues.length > 0) {
+                const venue = event._embedded.venues[0];
+                return {
+                  line: venue.address?.line1 || "No Address",
+                  city: venue.city?.name || "No City",
+                  country: venue.country?.name || "No Country",
+                };
+              }
+              
+              // Default fallback
+              return {
+                line: "No Address",
+                city: "No City", 
+                country: "No Country"
+              };
+            };
+
+            // Helper function to safely get coordinates
+            const getCoordinates = (event) => {
+              // Check for PredictHQ format
+              if (event.geo && event.geo.geometry && event.geo.geometry.coordinates) {
+                return event.geo.geometry.coordinates;
+              }
+              
+              // Check for Ticketmaster format
+              if (event._embedded && event._embedded.venues && event._embedded.venues.length > 0) {
+                const venue = event._embedded.venues[0];
+                if (venue.location) {
+                  return {
+                    long: venue.location.longitude,
+                    lat: venue.location.latitude,
+                  };
+                }
+              }
+              
+              // Default fallback
+              return { long: 0, lat: 0 };
+            };
+
+            // Helper function to safely get location link
+            const getLocationLink = (event) => {
+              if (event.geo && event.geo.geometry && event.geo.geometry.link) {
+                return event.geo.geometry.link;
+              }
+              return "No Location Link";
+            };
+
+            // Create a new EventDTO instance
+            const eventDTO = new EventDTO({
+              name: event.name || event.title || "No Name",
+              description: event.description || "No Description",
+              location: new LocationDTO(
+                getAddress(event),
+                getCoordinates(event),
+                getLocationLink(event)
+              ),
+              startDate: event.dates?.start?.dateTime || event.start_local || null,
+              endDate: event.dates?.end?.localDate || event.end_local || null,
+            });
+            
             //unique key
-            const uniqueKey = `${event.name}-${event.date}-${event.location}`;
+            const uniqueKey = `${eventDTO.name} at ${eventDTO.location.address.line} in ${eventDTO.location.address.city}`;
+            console.log(`Processing event: ${uniqueKey}`);
+            
             // Add only if it doesn't already exist
             if (!eventMap.has(uniqueKey)) {
-              eventMap.set(uniqueKey, event);
+              eventMap.set(uniqueKey, eventDTO); // Store the DTO, not the raw event
             }
           });
         }
@@ -61,7 +137,5 @@ async function eventsAggregationByCountry(countryCode) {
     return [];
   }
 }
-
-eventsAggregationByCountry("IE");
 
 export { eventsAggregationByCountry };

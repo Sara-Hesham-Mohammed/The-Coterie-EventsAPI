@@ -121,13 +121,15 @@ async function scrapeEvents() {
   return events;
 }
 
-scrapeEvents().then(events => {
-  events.forEach((eventList, i) => {
-    console.log(`\n--- Event Source ${i + 1} ---`);
-    eventList.forEach(event => {
-      console.log(event);
-    });
-  });
-}); //run this ever x amt of time automatically and replace the list that's in the DB, maybe archive the old list
+console.log("In web scraping file, but not calling the fn yet.");
+
+// scrapeEvents().then(events => {
+//   events.forEach((eventList, i) => {
+//     console.log(`\n--- Event Source ${i + 1} ---`);
+//     eventList.forEach(event => {
+//       console.log(event);
+//     });
+//   });
+// }); //run this ever x amt of time automatically and replace the list that's in the DB, maybe archive the old list
 
 export { scrapeEvents };

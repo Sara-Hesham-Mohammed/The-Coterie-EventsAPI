@@ -1,15 +1,16 @@
 // Supporting DTOs
-interface LocationDto {
-  country: string;
-  city: string;
+interface LocationDTO {
   address: string;
+  country: string;
+  link?: string; // URL to the location or venue
+  city?: string;
   state?: string;
   zipCode?: string;
   latitude?: number;
   longitude?: number;
 }
 
-interface TicketSellerDto {
+interface TicketSellerDTO {
   id: number;
   name: string;
   url: string;
@@ -24,20 +25,20 @@ enum EventStatus {
 }
 
 // Main Event DTO
-interface EventDto {
+interface EventDTO {
   eventId: number;
   eventTitle: string;
-  eventDescription: string;
+  eventDescription?: string;
   hostName?: string;
-  location: LocationDto;
+  location: LocationDTO;
   startTime: string; // ISO 8601 string format
-  endTime: string; // ISO 8601 string format
+  endTime?: string; // ISO 8601 string format
   status: EventStatus;
   isRecurring?: boolean;
   maxAttendees?: number;
   isPaid?: boolean;
   price?: number;
-  ticketSellers?: TicketSellerDto[];
+  ticketSellers?: TicketSellerDTO[];
 }
 
-export { EventDto, LocationDto, TicketSellerDto, EventStatus };
+export { EventDTO, LocationDTO, TicketSellerDTO, EventStatus };

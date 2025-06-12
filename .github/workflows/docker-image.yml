@@ -21,7 +21,7 @@ jobs:
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
     - name: Tag the image
-      run: docker tag events-api-image:$(date +%s) yourdockerhubusername/events-api-image:latest
+      run: docker tag events-api-image:$(date +%s) ${{ secrets.DOCKERHUB_USERNAME }}/events-api-image:latest
 
     - name: Push to Docker Hub
       run: docker push yourdockerhubusername/events-api-image:latest

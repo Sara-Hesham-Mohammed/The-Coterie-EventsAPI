@@ -16,3 +16,13 @@ jobs:
     - uses: actions/checkout@v4
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag events-api-image:$(date +%s)
+      
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+    - name: Tag the image
+      run: docker tag events-api-image:$(date +%s) yourdockerhubusername/events-api-image:latest
+
+    - name: Push to Docker Hub
+      run: docker push yourdockerhubusername/events-api-image:latest
+

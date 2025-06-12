@@ -7,22 +7,25 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
+    env:
+      IMAGE_NAME: events-api-image
+      IMAGE_TAG: ${{ github.run_number }} # or use `IMAGE_TAG: latest` if you want
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag events-api-image:$(date +%s)
-      
-    - name: Log in to Docker Hub
-      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+      - uses: actions/checkout@v4
 
-    - name: Tag the image
-      run: docker tag events-api-image:$(date +%s) ${{ secrets.DOCKERHUB_USERNAME }}/events-api-image:latest
+      - name: Build the Docker image
+        run: |
+          docker build . --file Dockerfile --tag $IMAGE_NAME:$IMAGE_TAG
 
-    - name: Push to Docker Hub
-      run: docker push yourdockerhubusername/events-api-image:latest
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Tag the image
+        run: docker tag $IMAGE_NAME:$IMAGE_TAG ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$IMAGE_TAG
+
+      - name: Push to Docker Hub
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$IMAGE_TAG
+
 

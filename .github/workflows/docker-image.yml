@@ -1,6 +1,9 @@
 name: Docker Image CI
 
 on:
+  schedule:
+      - cron: "0 4 * * *"  # Runs every day at 4 AM UTC = 9 AM in cairo
+  workflow_dispatch:  
   push:
     branches: [ "main" ]
   pull_request:
@@ -15,6 +18,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'  # or any version you need
+  # Run the scraper
+      - name: Install Node.js dependencies
+        run: npm install
+
+      - name: Run scraper
+        run: node web-scraper.js
+        # only run during cron
+        if: github.event_name == 'schedule'
+
+# Build and push docker img
       - name: Build the Docker image
         run: |
           docker build . --file Dockerfile --tag $IMAGE_NAME:$IMAGE_TAG

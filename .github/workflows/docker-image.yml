@@ -22,10 +22,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20' 
-  # Run the scraper
+ 
       - name: Install Node.js dependencies
         run: npm install
-
+        
+       # Run the scraper
       - name: Run scraper
         run: node web-scraper.js
         # only run during cron

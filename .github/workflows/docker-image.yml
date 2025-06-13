@@ -14,14 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: events-api-image
-      IMAGE_TAG: ${{ github.run_number }} # or use `IMAGE_TAG: latest` if you want
+      IMAGE_TAG: ${{ github.run_number }} 
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # or any version you need
+          node-version: '20' 
   # Run the scraper
       - name: Install Node.js dependencies
         run: npm install

@@ -16,19 +16,21 @@ app.get("/", async (req, res) => {
 
 app.get("/all-events/:country", async (req, res) => {
   console.log(`Fetching events for country: ${req.params.country}`);
+  console.log("Trying to get countries");
+  
 
   const events = [];
   const countryCode = req.params.country;
 
-  // Get aggregated events
-  const countryEvents = await eventsAggregationByCountry(countryCode);
-  events.push(...countryEvents);
+  // // Get aggregated events
+  // const countryEvents = await eventsAggregationByCountry(countryCode);
+  // events.push(...countryEvents);
 
-  // // If Egypt, also scrape
-  // if (countryCode.toUpperCase() === "EG") {
-  //   const scrapedEvents = await scrapeEvents();
-  //   events.push(...scrapedEvents);
-  // }
+  // If Egypt, also scrape
+  if (countryCode.toUpperCase() === "EG") {
+    const scrapedEvents = await scrapeEvents();
+    events.push(...scrapedEvents);
+  }
 
   // Send the response ONCE
   res.status(200).json(events);

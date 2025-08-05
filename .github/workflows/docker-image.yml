@@ -64,6 +64,6 @@ jobs:
           sudo docker rm -f events-api-container || true
           sudo docker rmi $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG || true
           sudo docker pull $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG
-          sudo docker run --name events-api-container -p 3003:3003 --restart=always -d $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG
+          sudo docker run --name events-api-container -p 3002:3002 --restart=always -d $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG
 
 

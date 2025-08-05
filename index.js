@@ -23,8 +23,8 @@ app.get("/all-events/:country", async (req, res) => {
   const countryCode = req.params.country;
 
   // // Get aggregated events
-  // const countryEvents = await eventsAggregationByCountry(countryCode);
-  // events.push(...countryEvents);
+  const countryEvents = await eventsAggregationByCountry(countryCode);
+  events.push(...countryEvents);
 
   // If Egypt, also scrape
   if (countryCode.toUpperCase() === "EG") {

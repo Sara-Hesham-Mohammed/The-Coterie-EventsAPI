@@ -9,6 +9,7 @@ class EventDTO {
     location = LocationDTO,
     startDate = null,
     endDate = null,
+    images= []
   } = {}) {
     this.id = EventDTO._initId++; // Always auto-generated
     this.name = name;
@@ -16,6 +17,7 @@ class EventDTO {
     this.location = LocationDTO instanceof LocationDTO ? location : new LocationDTO(location);
     this.startDate = startDate;
     this.endDate = endDate;
+    this.images = images;
   }
 }
 

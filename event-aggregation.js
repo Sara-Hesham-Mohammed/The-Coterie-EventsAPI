@@ -115,7 +115,7 @@ async function eventsAggregationByCountry(countryCode) {
               startDate:
                 event.dates?.start?.dateTime || event.start_local || null,
               endDate: event.dates?.end?.localDate || event.end_local || null,
-              images: event.images[0]?.url,
+              images: event.images[0]?.url || null,
             });
 
             //unique key
